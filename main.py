@@ -7,24 +7,44 @@ from config.config import TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUM
 
 
 def get_headline():
+    """
+    Get the headline of the top post from reddit
+    :return:
+    """
     r = praw.Reddit(user_agent='jana_challenge')
     page = r.get_front_page(limit=1)
     post = next(page)
     return post.title
 
-client = TwilioRestClient(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
-twiml = open('twiml.xml', 'r').read()
+def get_url_encoded_twiml():
+    """
+    Get the twiml xml file
+    :return:
+    """
+    twiml = open('twiml.xml', 'r').read()
+    twiml = twiml.format(name='Jon Arbaugh', headline=get_headline())
+    twiml = urllib.parse.quote_plus(twiml)
 
-twiml = twiml.format(name='Jon Arbaugh', headline=get_headline())
+    return twiml
 
-# maybe not with the plus part, takes up a lot of space with white-space-plus-signs
-twiml = urllib.parse.quote_plus(twiml)
 
-print(twiml)
+def get_call_url():
+    """
+    Use the twimlets echo app with the result
+    of get_url_encoded_twiml to create the call url
+    :return:
+    """
+    return 'http://twimlets.com/echo?Twiml=' + get_url_encoded_twiml()
 
-call = client.calls.create(to='+14438789292',
-                           from_=TWILIO_FROM_NUMBER,
-                           url='http://twimlets.com/echo?Twiml=' + twiml)
 
-print(call.sid)
+def main():
+    client = TwilioRestClient(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+    call = client.calls.create(to='',
+                               from_=TWILIO_FROM_NUMBER,
+                               url=get_call_url())
+    print(call.sid)
+
+
+if __name__ == '__main__':
+    main()
