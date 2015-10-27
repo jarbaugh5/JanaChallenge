@@ -3,7 +3,7 @@ import praw
 
 from twilio.rest import TwilioRestClient
 
-from config.config import TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER
+from config.config import TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER, TWILIO_TO_NUMBER
 
 
 def get_headline():
@@ -40,7 +40,7 @@ def get_call_url():
 
 def main():
     client = TwilioRestClient(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-    call = client.calls.create(to='',
+    call = client.calls.create(to=TWILIO_TO_NUMBER,
                                from_=TWILIO_FROM_NUMBER,
                                url=get_call_url())
     print(call.sid)
